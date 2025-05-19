@@ -67,7 +67,7 @@ $(window).on('load', function () {
           <div>${positionData[i].name || "Hospital Name Not Mentioned"}</div>
           <div>Survey conducted by: ${positionData[i].conducted_by || "No Name"}</div>
           <div>Survey conducted on: ${positionData[i].conducted_on || "No Time"}</div>
-           <div>Survey Doctor Name: ${positionData[i].doctor || "No Time"}</div>
+           <div>Survey Doctor Name: ${positionData[i].city || "no data"}</div>
           <div>Address: ${positionData[i].address || "Private address"}</div>
           </p>`;
           return function () {
