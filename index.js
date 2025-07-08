@@ -34,7 +34,7 @@ window.initMap = initMap;
 
 $(window).on('load', function () {
   // sheetID you can find in the URL of your spreadsheet after "spreadsheet/d/"
-  const sheetId = "1vkffebIJqjxTwXiTim-b7ZBc0zMV6CUphF-7EIfxFOw";
+  const sheetId = "1FTkdNlwxdFYtVdlfQ532O-I0naBiEzFJ9lKoI95rwRA";
   // sheetName is the name of the TAB in your spreadsheet (default is "Sheet1")
   const sheetName = encodeURIComponent("Sheet1");
   const sheetURL = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=${sheetName}`;
@@ -45,11 +45,13 @@ $(window).on('load', function () {
     success: function (response) {
       const positionData = $.csv.toObjects(response);
       console.log(positionData);
-      const image = {
-          url: "./markerIcon.png",
-          scaledSize: new google.maps.Size(30, 30)
+      const image = (pending) => {
+        return {
+          url: pending ? "./pendingIcon.png" : "./markerIcon.png",
+          scaledSize: new google.maps.Size(20, 20)
+        };
       };
-      
+
       var marker;
       var infowindow = new google.maps.InfoWindow();
       for (let i = 0; i < positionData.length; i++) {
@@ -59,17 +61,20 @@ $(window).on('load', function () {
             lng: parseFloat(positionData[i].lng)
           }),
           map: map,
-          icon: image
+          icon: image(!positionData[i].conducted)
         });
         google.maps.event.addListener(marker, 'click', (function (marker, i) {
           var boxText = document.createElement("p");
-          boxText.innerHTML = `<p class="hook">
-          <div>${positionData[i].name || "Hospital Name Not Mentioned"}</div>
-          <div>Survey conducted by: ${positionData[i].conducted_by || "No Name"}</div>
-          <div>Survey conducted on: ${positionData[i].conducted_on || "No Time"}</div>
-            <div>Survey Pin code: ${positionData[i].pin_code || "No pin code"}</div>
-           <div>Type: ${positionData[i].city || "no data"}</div>
-          <div>Address: ${positionData[i].address || "Private address"}</div>
+          boxText.innerHTML = positionData[i].conducted ? `<p class="hook">
+          <h3>${positionData[i].name || "Hospital Name Not Mentioned"}</h3>
+        //  <div><b>Survey conducted by:</b> ${positionData[i].conducted || "IBWG"}</div>
+          <div><b>Survey conducted on:</b> ${positionData[i].conducted_on || "No Time"}</div>
+           <div><b>HCF TYPE:</b> ${positionData[i].hcftype || "No Time"}</div>
+          <div><b>Address:</b> ${positionData[i].address || "Private address"}</div>
+          </p>` : `<p class="hook">
+          <h3>${positionData[i].name || "Hospital Name Not Mentioned"}</h3>
+          <div><b>Address:</b> ${positionData[i].address || "Private address"}</div>
+          <h4>Register HCF</h4>
           </p>`;
           return function () {
             infowindow.setContent(boxText);
@@ -81,4 +86,3 @@ $(window).on('load', function () {
     },
   });
 });
-
